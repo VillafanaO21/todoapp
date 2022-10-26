@@ -1,94 +1,22 @@
 var express = require('express');
-const {sequelize} = require("../models");
-const {QueryTypes} = require("sequelize");
 var router = express.Router();
+const toDoController = require("../controllers/todo_controller.js")
 
 /* GET home page. */
-router.get('/', async function (req, res, next) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
+router.get('/', toDoController.homeRoute);
 
-    let toDoItems = await sequelize.query('select * from toDo', {type: QueryTypes.SELECT});
-    res.render('index', {toDoItems});
-})
+router.get('/add', toDoController.renderAddForm);
 
-router.get('/add', function (req, res) {
-    res.render('create_todo');
-})
+router.post('/add', toDoController.addNewItem);
 
-router.post('/add', async function (req, res,) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
-    await sequelize.query('insert into todo ',{
-        type: QueryTypes.UPDATE,
-        replacement: {
-            id: req.params.id
-        }
-    });
-    res.redirect('/');
-})
+router.get('/complete/:id', toDoController.markItemAsComplete);
 
-router.get('/complete/:id', async function (req, res,) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
-    await sequelize.query('update todo set completed = true where id = :id ',{
-        type: QueryTypes.UPDATE,
-        replacement: {
-            id: req.params.id
-        }
-    });
-    res.redirect('/');
-})
+router.get('/incomplete/:id',toDoController.markItemAsIncomplete);
 
-router.get('/incomplete/:id', async function (req, res,) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
-    await sequelize.query('update todo set completed = false where id = :id ',{
-        type: QueryTypes.UPDATE,
-        replacement: {
-            id: req.params.id
-        }
-    });
-    res.redirect('/');
-})
+router.get('/delete/:id',toDoController.deleteItem);
 
-router.get('/delete/:id', async function (req, res) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
-    await sequelize.query('delete from todo where id = :id', {
-        type: QueryTypes.DELETE,
-        replacement: {
-            id: req.params.id
-        }
-    });
-    res.redirect('/');
-})
+router.get('/edit/:id', toDoController.renderEditForm);
 
-router.get('/edit/:id', async function (req, res) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
-    await sequelize.query('select * from toDo where id = :id', {
-        type: QueryTypes.SELECT,
-        replacements: {
-            id: req.params.id,
-        }
-    });
-    const item = results[0]
-    console.log(results);
-    res.render('edit_todo', {item})
-})
+router.post('/edit/:id', toDoController.updateItem);
 
-router.post('/edit/:id', async function (req, res) {
-    const {sequelize} = require("../models/index");
-    const {QueryTypes} = require("sequelize");
-    await sequelize.query('update toDo set description = :description where id = :id', {
-        type: QueryTypes.UPDATE,
-        replacements: {
-            id: req.params.id,
-            description: req.body.description
-        }
-    });
-    res.redirect('/');
-})
 module.exports = router;
-
